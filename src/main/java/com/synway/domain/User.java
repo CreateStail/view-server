@@ -13,5 +13,5 @@ public class User {
     private String email;
     private Integer sex;
     private Date createTime;
-    private int state;
+    private Integer state;
 }

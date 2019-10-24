@@ -1,6 +1,6 @@
 package com.synway.filter;
 
-import com.synway.vo.JWTToken;
+import com.synway.domain.JWTToken;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,7 @@ import java.net.URLEncoder;
  * JWT过滤器
  */
 public class JWTFilter extends BasicHttpAuthenticationFilter {
-    private Logger logger = LoggerFactory.getLogger(JWTFilter.class);
+    private static final Logger logger = LoggerFactory.getLogger(JWTFilter.class);
 
     /**
      * 如果带有token,则对token进行检查，否则直接通过
@@ -33,7 +33,8 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
                 return true;
             }catch (Exception e){
                 //token错误
-                responseError(response,e.getMessage());
+//                responseError(response,e.getMessage());
+                logger.info(e.getMessage());
             }
         }
         return true;

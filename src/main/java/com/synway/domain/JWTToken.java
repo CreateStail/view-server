@@ -1,4 +1,4 @@
-package com.synway.vo;
+package com.synway.domain;
 
 import org.apache.shiro.authc.AuthenticationToken;
 

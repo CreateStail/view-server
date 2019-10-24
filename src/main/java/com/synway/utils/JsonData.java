@@ -1,14 +1,19 @@
 package com.synway.utils;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 /**
  * 返回值
  */
 @AllArgsConstructor
 @NoArgsConstructor
-public class JsonData {
+@Data
+public class JsonData implements Serializable{
+    private static final long  seriaVersionUID = 1L;
     int code;//状态码:0成功,1处理中,-1失败
     String msg;//描述
     Object data;//数据

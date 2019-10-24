@@ -1,12 +1,12 @@
 package com.synway.dao;
 
-import com.synway.domain.User;
+import com.synway.pojo.User;
+import org.apache.ibatis.annotations.Param;
 
-/**
- * Created by issuser on 2019/10/23.
- */
 public interface UserMapper {
 
      User selectById(int id);
+
+     User getUserByLoginInfo(@Param("username")String username,@Param("password")String password);
 
 }

@@ -1,4 +1,4 @@
-package com.synway.domain;
+package com.synway.pojo;
 
 import lombok.Data;
 
@@ -8,5 +8,4 @@ public class Role {
     private Integer userId;
     private String role;
     private String permission;
-
 }

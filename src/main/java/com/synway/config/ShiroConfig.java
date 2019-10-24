@@ -1,7 +1,7 @@
 package com.synway.config;
 
 import com.synway.filter.JWTFilter;
-import com.synway.vo.CustomRealm;
+import com.synway.domain.CustomRealm;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.mgt.SecurityManager;

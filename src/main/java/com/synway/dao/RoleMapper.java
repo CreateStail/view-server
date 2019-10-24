@@ -1,10 +1,7 @@
 package com.synway.dao;
 
-import com.synway.domain.Role;
+import com.synway.pojo.Role;
 
-/**
- * Created by issuser on 2019/10/23.
- */
 public interface RoleMapper {
     Role getRoleAndPermission(int id);
 }

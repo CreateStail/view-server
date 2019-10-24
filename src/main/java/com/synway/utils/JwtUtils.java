@@ -5,7 +5,9 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.synway.domain.User;
+import com.synway.pojo.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
@@ -14,9 +16,12 @@ import java.util.Date;
  * jwt工具类
  */
 public class JwtUtils {
+    private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
     private static final String SUBJECT = "mySign";
     private static final long EXPIRE = 1000 * 60 * 60 ;//过期时间为1小时
     private static final String APPSECRET = Aesssss.encrypt("myAppSecret",Aesssss.key);
+
+
 
     /**
      * 生成jwt
@@ -43,7 +48,7 @@ public class JwtUtils {
                                 .sign(Algorithm.HMAC256(APPSECRET));
                 return token;
             } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+                logger.error("生产token失败:",e);
             }
         }
         return null;
@@ -65,15 +70,16 @@ public class JwtUtils {
             return null;
         }
     }*/
-    public static boolean verify(String token,String name,String id){
+    public static boolean verify(String token,String name,int id){
         try {
-            JWTVerifier verifier = JWT.require(Algorithm.HMAC256(token))
+            JWTVerifier verifier = JWT.require(Algorithm.HMAC256(APPSECRET))
                                     .withClaim("id",id)
                                     .withClaim("name",name)
                                     .build();
             verifier.verify(token);
             return true;
         }catch (Exception e){
+            logger.error("验证token失败:"+e);
             return false;
         }
     }
@@ -89,6 +95,7 @@ public class JwtUtils {
             DecodedJWT jwt = JWT.decode(token);
             return jwt.getClaim("name").asString();
         } catch (JWTDecodeException e) {
+            logger.error("获取token，用户名失败:"+e);
             return null;
         }
     }
@@ -99,12 +106,13 @@ public class JwtUtils {
      * @param token the token
      * @return token中包含的用户名 username
      */
-    public static String getUserId(String token) {
+    public static int getUserId(String token) {
         try {
             DecodedJWT jwt = JWT.decode(token);
-            return jwt.getClaim("id").asString();
+            return jwt.getClaim("id").asInt();
         } catch (JWTDecodeException e) {
-            return null;
+            logger.error("获取token，用户id失败:"+e);
+            return 0;
         }
     }
 

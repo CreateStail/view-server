@@ -1,5 +1,6 @@
 package com.synway.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -25,6 +26,9 @@ public class SwaggerConfig {
      *
      * @return the docket
      */
+    @Value("${swagger.is.enable}")
+    private boolean swagger_is_enable;
+
     @Bean
     public Docket createRestApi() {
         ParameterBuilder tokenPar = new ParameterBuilder();
@@ -35,6 +39,7 @@ public class SwaggerConfig {
                 .required(false).build();
         pars.add(tokenPar.build());
         return new Docket(DocumentationType.SWAGGER_2)
+                .enable(swagger_is_enable)
                 .apiInfo(metaData())
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.dashuai.learning.jwt.api"))

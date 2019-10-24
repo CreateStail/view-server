@@ -1,9 +1,7 @@
-package com.synway.vo;
+package com.synway.domain;
 
-import com.synway.dao.RoleMapper;
-import com.synway.dao.UserMapper;
-import com.synway.domain.Role;
-import com.synway.domain.User;
+import com.synway.pojo.Role;
+import com.synway.pojo.User;
 import com.synway.service.RoleService;
 import com.synway.service.UserService;
 import com.synway.utils.JwtUtils;
@@ -15,6 +13,8 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashSet;
@@ -24,6 +24,8 @@ import java.util.Set;
  * 实现用户授权验证和权限验证
  */
 public class CustomRealm extends AuthorizingRealm {
+    private static final Logger logger = LoggerFactory.getLogger(CustomRealm.class);
+
     @Autowired
     private UserService userService;
     @Autowired
@@ -36,15 +38,15 @@ public class CustomRealm extends AuthorizingRealm {
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
-        System.out.println("----------身份认证方法----------");
+        logger.info("----------身份认证方法----------");
         String token = (String) authenticationToken.getCredentials();
         // 解密获得username，用于和数据库进行对比
         String username = JwtUtils.getUserName(token);
-        String id = JwtUtils.getUserId(token);
-        if (username == null || !JwtUtils.verify(token, username, id) || id == null) {
+        int id = JwtUtils.getUserId(token);
+        if (username == null || !JwtUtils.verify(token, username, id) || id == 0) {
             throw new AuthenticationException("token认证失败！");
         }
-        User user = userService.selectById(Integer.valueOf(id));
+        User user = userService.selectById(id);
         if (user == null) {
             throw new AuthenticationException("该用户不存在！");
         }
@@ -60,8 +62,8 @@ public class CustomRealm extends AuthorizingRealm {
      */
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-        System.out.println("————权限认证————");
-        String userId = JwtUtils.getUserId(principals.toString());
+        logger.info("————权限认证————");
+        int userId = JwtUtils.getUserId(principals.toString());
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
         //获得该用户角色
 //        String role = userService.getRole(userId);
@@ -70,8 +72,8 @@ public class CustomRealm extends AuthorizingRealm {
         Role role = null;
         Set<String> permissionSet = new HashSet<>();
         Set<String> roleSet = new HashSet<>();
-        if (userId != null) {
-            role = roleService.getRoleAndPermission(Integer.parseInt(userId));
+        if (userId != 0) {
+            role = roleService.getRoleAndPermission(userId);
             //需要将 role, permission 封装到 Set 作为 info.setRoles(), info.setStringPermissions() 的参数
             roleSet.add(role.getRole());
             permissionSet.add(role.getPermission());

@@ -5,7 +5,8 @@ import com.synway.service.UserService;
 import com.synway.utils.JsonData;
 import com.synway.utils.JwtUtils;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authz.UnauthorizedException;
+import org.apache.shiro.authc.IncorrectCredentialsException;
+import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -34,7 +35,7 @@ public class UserController {
         if(user != null){
             return JsonData.buildSuccess("登录成功", JwtUtils.getJsonWebToken(user));
         }else{
-            throw new UnauthorizedException();
+            throw new IncorrectCredentialsException();
         }
     }
 

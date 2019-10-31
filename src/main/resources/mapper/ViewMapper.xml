@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.synway.dao.ViewMapper">
+    <insert id="saveIntroduction" parameterType="map">
+      <selectKey keyProperty="theme_id" resultType="int" order="AFTER">
+          select last_insert_id()
+      </selectKey>
+      insert into t_theme(theme,
+        <if test="themePic_Path != null and themePic_Path != '' ">
+            theme_pic,
+        </if>
+        <if test="introduction != null and introduction != ''">
+            introduction_content,
+        </if>
+        <if test="introduction_html != null and introduction_html != ''">
+            introduction_html,
+        </if>
+        user_id,user_name)
+      VALUES
+      (#{theme},
+        <if test="themePic_Path != null and themePic_Path != '' ">
+            #{themePic_Path},
+        </if>
+        <if test="introduction != null and introduction != ''">
+            #{introduction},
+        </if>
+        <if test="introduction_html != null and introduction_html != ''">
+            #{introduction_html},
+        </if>
+        ,#{user_id},#{user_name})
+    </insert>
+
+    <insert id="saveBackground" parameterType="map">
+        <selectKey resultType="int" keyProperty="background_id" order="AFTER">
+            select last_insert_id()
+        </selectKey>
+        insert into t_background(theme_id,
+        <if test="background_content != null and background_content != ''">
+            background_content,
+        </if>
+        <if test="background_html != null and background_html != ''">
+            background_html,
+        </if>
+        )
+        VALUES
+        (#{theme_id},
+        <if test="background_content != null and background_content != ''">
+            #{background},
+        </if>
+        <if test="background_html != null and background_html != ''">
+            #{background_html},
+        </if>
+        )
+    </insert>
+
+    <insert id="saveData" parameterType="map">
+        <selectKey keyProperty="data_id" resultType="int" order="AFTER">
+            select last_insert_id()
+        </selectKey>
+        insert into t_data(theme_id)
+        VALUES
+        (#{theme_id})
+    </insert>
+
+    <insert id="saveProgram" parameterType="map">
+        <selectKey keyProperty="program_id" resultType="int" order="AFTER">
+            select last_insert_id()
+        </selectKey>
+        insert into t_program(theme_id)
+        VALUES
+        (#{theme_id})
+    </insert>
+
+    <insert id="saveCode" parameterType="map">
+        <selectKey keyProperty="code_id" resultType="int" order="AFTER">
+            select last_insert_id()
+        </selectKey>
+        insert into t_code(theme_id)
+        VALUES
+        (#{theme_id})
+    </insert>
+    
+    <insert id="saveFile" parameterType="map">
+        insert into t_file(
+          theme_id,
+          <if test="business_id != null and business_id != ''">
+              business_id,
+          </if>
+        )
+
+
+    </insert>
+</mapper>
+

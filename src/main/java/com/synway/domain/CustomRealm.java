@@ -5,10 +5,7 @@ import com.synway.pojo.User;
 import com.synway.service.RoleService;
 import com.synway.service.UserService;
 import com.synway.utils.JwtUtils;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
@@ -37,21 +34,21 @@ public class CustomRealm extends AuthorizingRealm {
     }
 
     @Override
-    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) {
         logger.info("----------身份认证方法----------");
         String token = (String) authenticationToken.getCredentials();
         // 解密获得username，用于和数据库进行对比
         String username = JwtUtils.getUserName(token);
         int id = JwtUtils.getUserId(token);
         if (username == null || !JwtUtils.verify(token, username, id) || id == 0) {
-            throw new AuthenticationException("token认证失败！");
+            throw new IncorrectCredentialsException("token认证失败！");
         }
         User user = userService.selectById(id);
         if (user == null) {
-            throw new AuthenticationException("该用户不存在！");
+            throw new IncorrectCredentialsException("用户密码不正确！");
         }
         if (user.getState() == 1) {
-            throw new AuthenticationException("该用户已被封号！");
+            throw new LockedAccountException("该用户已被封号！");
         }
         return new SimpleAuthenticationInfo(token, token, "MyRealm");
     }

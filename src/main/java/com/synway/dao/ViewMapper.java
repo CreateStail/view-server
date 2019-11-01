@@ -2,6 +2,7 @@ package com.synway.dao;
 
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Map;
 @Repository
 public interface ViewMapper {
@@ -16,6 +17,13 @@ public interface ViewMapper {
 
     int saveCode(Map<String,Object> params);
 
-    int saveFile(Map<String,Object> params);
+    void saveFile(Map<String,Object> params);
 
+    List<Map<String,Object>> listThemeData();
+
+    Map<String,Object> getThemeContent(String theme_id);
+
+    Map<String,Object> getBackgroundContent(String theme_id);
+
+    Map<String,Object> findAttachment(Map<String,String> params);
 }

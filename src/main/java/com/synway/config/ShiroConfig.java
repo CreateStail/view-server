@@ -48,6 +48,7 @@ public class ShiroConfig {
          filterRuleMap.put("/swagger-ui.html","anon");
          filterRuleMap.put("/webjars/**","anon");
          // 访问 /unauthorized/** 不通过JWTFilter
+         filterRuleMap.put("/view-server/Api/listThemeData","anon");
          factoryBean.setFilterChainDefinitionMap(filterRuleMap);
          return factoryBean;
      }

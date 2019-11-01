@@ -39,7 +39,7 @@ public class UploadService {
                 rootFile.mkdir();
             }
             fileName = file.getOriginalFilename();
-            create_file = new File(fielPrefix + "/" + fileName);
+            create_file = new File(fielPrefix + fileName);
             out = new BufferedOutputStream(new FileOutputStream(create_file));
             out.write(file.getBytes());
             out.flush();
@@ -57,12 +57,12 @@ public class UploadService {
         BufferedOutputStream out = null;
         Map<String, Object> paramsMap = new HashMap<>();
         Map<String, Object> resultMap = new HashMap<>();
-        File rootFile = new File(fielPrefix + "/content");
+        File rootFile = new File(fielPrefix + "content");
         if (!rootFile.exists()) {
             rootFile.mkdirs();
         }
         fileName = file.getOriginalFilename();
-        File create_file = new File(fielPrefix + "/content/" + fileName);
+        File create_file = new File(fielPrefix + "content/" + fileName);
         paramsMap.put("file_name", create_file.getName());
         paramsMap.put("file_path", create_file.getPath());
         paramsMap.put("file_addr", fielPrefixMapping + "content/" + fileName);

@@ -3,11 +3,11 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.synway.dao.ViewMapper">
     <insert id="saveIntroduction" parameterType="map">
-      <selectKey keyProperty="theme_id" resultType="int" order="AFTER">
-          select last_insert_id()
-      </selectKey>
-      insert into t_theme(theme,
-        <if test="themePic_Path != null and themePic_Path != '' ">
+        <selectKey keyProperty="theme_id" resultType="int" order="AFTER">
+            select last_insert_id()
+        </selectKey>
+        insert into t_theme(theme,
+        <if test="themePic_Addr != null and themePic_Addr != '' ">
             theme_pic,
         </if>
         <if test="introduction != null and introduction != ''">
@@ -17,10 +17,10 @@
             introduction_html,
         </if>
         user_id,user_name)
-      VALUES
-      (#{theme},
-        <if test="themePic_Path != null and themePic_Path != '' ">
-            #{themePic_Path},
+        VALUES
+        (#{theme},
+        <if test="themePic_Addr != null and themePic_Addr != '' ">
+            #{themePic_Addr},
         </if>
         <if test="introduction != null and introduction != ''">
             #{introduction},
@@ -28,28 +28,28 @@
         <if test="introduction_html != null and introduction_html != ''">
             #{introduction_html},
         </if>
-        ,#{user_id},#{user_name})
+          #{user_id},#{user_name})
     </insert>
 
     <insert id="saveBackground" parameterType="map">
         <selectKey resultType="int" keyProperty="background_id" order="AFTER">
             select last_insert_id()
         </selectKey>
-        insert into t_background(theme_id,
+        insert into t_background(theme_id
         <if test="background_content != null and background_content != ''">
-            background_content,
+            ,background_content
         </if>
         <if test="background_html != null and background_html != ''">
-            background_html,
+            ,background_html
         </if>
         )
         VALUES
-        (#{theme_id},
+        (#{theme_id}
         <if test="background_content != null and background_content != ''">
-            #{background},
+            ,#{background}
         </if>
         <if test="background_html != null and background_html != ''">
-            #{background_html},
+            ,#{background_html}
         </if>
         )
     </insert>
@@ -80,16 +80,67 @@
         VALUES
         (#{theme_id})
     </insert>
-    
+
     <insert id="saveFile" parameterType="map">
         insert into t_file(
-          theme_id,
-          <if test="business_id != null and business_id != ''">
-              business_id,
-          </if>
+        theme_id,
+        <if test="business_id != null and business_id != ''">
+            business_id,
+        </if>
+        <if test="business_name != null and business_name != ''">
+            business_name,
+        </if>
+        <if test="file_name != null and file_name != ''">
+            file_name,
+        </if>
+        <if test="file_path != null and file_path != ''">
+            file_path,
+        </if>
+        <if test="file_addr != null and file_addr != ''">
+            file_addr,
+        </if>
+            type
         )
-
-
+        VALUES (
+        #{theme_id},
+        <if test="business_id != null and business_id != ''">
+            #{business_id},
+        </if>
+        <if test="business_name != null and business_name != ''">
+            #{business_name},
+        </if>
+        <if test="file_name != null and file_name != ''">
+            #{file_name},
+        </if>
+        <if test="file_path != null and file_path != ''">
+            #{file_path},
+        </if>
+        <if test="file_addr != null and file_addr != ''">
+            #{file_addr},
+        </if>
+            #{type}
+        )
     </insert>
+
+    <select id="listThemeData" parameterType="map" resultType="map">
+        select id,theme,theme_pic,introduction_html from t_theme where is_delete = 0
+    </select>
+
+    <select id="getThemeContent" parameterType="map" resultType="map">
+        select id,theme,theme_pic,introduction_html from t_theme where is_delete = 0 and id=#{theme_id}
+    </select>
+
+    <select id="getBackgroundContent" parameterType="map" resultType="map">
+        select t.theme_pic,b.background_html from t_theme t left join t_background b on t.id = b.theme_id
+        where is_delete = 0 and t.id=#{theme_id}
+    </select>
+
+
+    <select id="findAttachment" parameterType="map" resultType="map">
+        select t.theme_pic, f.file_addr,f.file_name from t_theme t left join t_file f on t.id = f.theme_id
+        where f.is_delete = 0 and f.theme_id = #{theme_id}
+        and f.business_name= #{business_name}
+    </select>
+
 </mapper>
 

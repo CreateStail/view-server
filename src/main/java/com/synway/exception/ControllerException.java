@@ -8,6 +8,8 @@ import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.UnauthorizedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -18,12 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestControllerAdvice
 public class ControllerException {
 
-/*    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(ShiroException.class)
-    public JsonData handle401(ShiroException e){
-        return JsonData.buildError(401,e.getMessage(),null);
-    }*/
-
+    private static final Logger log = LoggerFactory.getLogger(ControllerException.class);
 
     @ExceptionHandler(ShiroException.class)
     public JsonData doHandleShiroException(ShiroException e) {
@@ -54,6 +51,7 @@ public class ControllerException {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public JsonData globalException(HttpServletRequest request, Throwable ex) {
+        log.error("异常详情:",ex);
         return JsonData.buildError(getStatus(request).value(), ex.getMessage(), null);
     }
 

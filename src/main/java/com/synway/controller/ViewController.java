@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -20,9 +21,11 @@ public class ViewController {
     @Autowired
     private ViewService viewService;
 
+    //TODO
     @PostMapping("/saveThemeContent")
     @RequiresRoles(value = "admin")
     public JsonData saveThemeContent(@RequestParam Map<String, Object> params,
+                                     @RequestParam(value = "templeteFile",required = false) MultipartFile templeteFile,
                                      HttpServletRequest request) {
         //这里先直接从请求头获取token,后面改为redis
         String token = request.getHeader("token");
@@ -31,7 +34,7 @@ public class ViewController {
 
         params.put("user_id", user_id);
         params.put("user_name", user_name);
-        boolean result = viewService.saveThemeContent(params);
+        boolean result = viewService.saveThemeContent(params,templeteFile);
         if (result) {
             return JsonData.buildSuccess("保存主题成功");
         } else {
@@ -52,7 +55,7 @@ public class ViewController {
     @PostMapping("/getThemeContent")
     public JsonData getThemeContent(@RequestParam String theme_id){
         Map<String, Object> themeContent = viewService.getThemeContent(theme_id);
-        if(!themeContent.isEmpty()){
+        if(themeContent != null){
             return JsonData.buildSuccess("查询主题id:"+theme_id+"成功",themeContent);
         }else{
             return JsonData.buildError("查询主题id:"+theme_id+"失败");
@@ -62,7 +65,7 @@ public class ViewController {
     @PostMapping("/getBackgroundContent")
     public JsonData getBackgroundContent(@RequestParam String theme_id){
         Map<String, Object> backgroundContent = viewService.getBackgroundContent(theme_id);
-        if(!backgroundContent.isEmpty()){
+        if(backgroundContent != null){
             return JsonData.buildSuccess("查询背景内容成功-----主题id:"+theme_id,backgroundContent);
         }else{
             return JsonData.buildError("查询背景内容-----主题id:"+theme_id+"失败");
@@ -72,7 +75,7 @@ public class ViewController {
     @PostMapping("/getDataContent")
     public JsonData getDataContent(@RequestParam String theme_id){
         Map<String, Object> dataContent = viewService.getDataContent(theme_id);
-        if(!dataContent.isEmpty()){
+        if(dataContent != null){
             return JsonData.buildSuccess("查询数据集内容成功-----主题id:"+theme_id,dataContent);
         }else{
             return JsonData.buildError("查询数据集内容-----主题id:"+theme_id+"失败");
@@ -82,7 +85,7 @@ public class ViewController {
     @PostMapping("/getProgramContent")
     public JsonData getProgramContent(@RequestParam String theme_id){
         Map<String, Object> programContent = viewService.getProgramContent(theme_id);
-        if(!programContent.isEmpty()){
+        if(programContent != null){
             return JsonData.buildSuccess("查询程序设计内容成功-----主题id:"+theme_id,programContent);
         }else{
             return JsonData.buildError("查询程序设计-----主题id:"+theme_id+"失败");
@@ -92,7 +95,7 @@ public class ViewController {
     @PostMapping("/getCodeContent")
     public JsonData getCodeContent(@RequestParam String theme_id){
         Map<String, Object> codeContent = viewService.getCodeContent(theme_id);
-        if(!codeContent.isEmpty()){
+        if(codeContent != null){
             return JsonData.buildSuccess("查询代码内容成功-----主题id:"+theme_id,codeContent);
         }else{
             return JsonData.buildError("查询代码内容-----主题id:"+theme_id+"失败");

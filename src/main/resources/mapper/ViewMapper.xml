@@ -99,7 +99,7 @@
         <if test="file_addr != null and file_addr != ''">
             file_addr,
         </if>
-            type
+            type,position
         )
         VALUES (
         #{theme_id},
@@ -118,7 +118,7 @@
         <if test="file_addr != null and file_addr != ''">
             #{file_addr},
         </if>
-            #{type}
+            #{type},#{position}
         )
     </insert>
 
@@ -131,7 +131,7 @@
     </select>
 
     <select id="getBackgroundContent" parameterType="map" resultType="map">
-        select t.theme_pic,b.background_html from t_theme t left join t_background b on t.id = b.theme_id
+        select t.theme_pic,b.background_html,b.id from t_theme t left join t_background b on t.id = b.theme_id
         where is_delete = 0 and t.id=#{theme_id}
     </select>
 
@@ -141,6 +141,32 @@
         where f.is_delete = 0 and f.theme_id = #{theme_id}
         and f.business_name= #{business_name}
     </select>
+
+    <select id="getDataByThemeId" parameterType="String" resultType="Map">
+        select t.theme_pic,t.theme,d.id from t_data d join t_theme t on t.id = d.theme_id
+        where theme_id = #{theme_id}
+    </select>
+
+    <select id="getProgramByThemeId" parameterType="String" resultType="Map">
+        select t.theme_pic,t.theme,d.id from t_program d join t_theme t on t.id = d.theme_id
+        where theme_id = #{theme_id}
+    </select>
+
+    <select id="getCodeByThemeId" parameterType="String" resultType="Map">
+        select t.theme_pic,t.theme,d.id from t_code d join t_theme t on t.id = d.theme_id
+        where theme_id = #{theme_id}
+    </select>
+
+    <select id = "getAttachmentByBusinessId" parameterType="int" resultType="map">
+      select file_name,file_path,file_addr,type,position from t_file where business_id = #{business_id}
+        and is_delete = 0
+    </select>
+
+    <select id = "getAttachmentByBusinessIdAndType" parameterType="map" resultType="map">
+        select file_name,file_path,file_addr,type,position from t_file where business_id = #{business_id}
+        and is_delete = 0 and business_name = #{business_name}
+    </select>
+
 
 </mapper>
 

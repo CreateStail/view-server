@@ -28,7 +28,7 @@ public class UploadController {
     public JsonData uplodFile(@RequestParam("file") MultipartFile file) {
         try {
             Map<String,String> resultMap = uploadService.uploadFile(file);
-            if(!resultMap.isEmpty()){
+            if(resultMap != null){
                 return JsonData.buildSuccess("上传成功",resultMap);
             }
         } catch (IOException e) {
@@ -48,5 +48,19 @@ public class UploadController {
             JsonData.buildError("上传失败");
         }
         return gson.toJson(resulMap);
+    }
+
+    @PostMapping("/uploadHeadImg")
+    public JsonData uplodHeadImg(@RequestParam("headImg") MultipartFile file) {
+        try {
+            Map<String,String> resultMap = uploadService.uploadHeadImg(file);
+            if(resultMap != null){
+                return JsonData.buildSuccess("上传成功",resultMap);
+            }
+        } catch (IOException e) {
+            log.error("上传失败==========="+file.getOriginalFilename());
+            JsonData.buildError("上传失败");
+        }
+        return JsonData.buildError("上传失败");
     }
 }

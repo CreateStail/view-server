@@ -102,7 +102,7 @@ public class ViewService {
             params.put("file_path", file_path);
             //如果是windows系统，模板中一般是 D:\software\nginx_win.rar,所以只需要soft..后的内容
             //否则就默认是linux系统,模板中是 /home/package/nginx/pcre/pcre-8.33.tar.gz 所以只需要home以后的内容,并且不需要转换符号
-            if(System.getProperty("os.name").startsWith("win")){
+            if(System.getProperty("os.name").startsWith("Win")){
                 params.put("file_addr", filePrefixMapping + file_path.substring(file_path.indexOf("\\") + 1).replace("\\","/"));
             }else{
                 params.put("file_addr", filePrefixMapping + file_path.substring(1));

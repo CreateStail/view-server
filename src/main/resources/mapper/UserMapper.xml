@@ -14,4 +14,29 @@
         select id,name from t_user where name = #{username} and password = #{password}
     </select>
 
+    <insert id="saveUser" parameterType="Map">
+        insert into t_user(name,password
+        <if test="headImg != null and headImg != ''">
+            ,headImg
+        </if>
+        <if test="phone != null and phone != ''">
+            ,phone
+        </if>
+        <if test="email != null and email != ''">
+            ,email
+        </if>
+        )VALUES
+        (#{username},#{password}
+        <if test="headImg != null and headImg != ''">
+            ,#{headImg}
+        </if>
+        <if test="phone != null and phone != ''">
+            ,#{phone}
+        </if>
+        <if test="email != null and email != ''">
+            ,#{email}
+        </if>
+        )
+    </insert>
+
 </mapper>

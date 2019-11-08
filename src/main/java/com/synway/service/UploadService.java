@@ -22,23 +22,42 @@ public class UploadService {
     private static Logger log = LoggerFactory.getLogger(UploadService.class);
 
     @Value("${file.prefix}")
-    private String fielPrefix = "";
+    private String filePrefix = "";
+    @Value("${file.prefix.content}")
+    private String filePrefixContent = "";
+    @Value("${file.prefix.user}")
+    private String filePrefixUser = "";
     @Value("${file.prefix.mapping}")
     private String filePrefixMapping = "";
 
     public Map<String, String> uploadFile(MultipartFile file) throws IOException {
+        return this.uploadFileMethod(file, filePrefix);
+    }
+
+    public Map<String,String> uploadHeadImg(MultipartFile file) throws IOException {
+        return this.uploadFileMethod(file,filePrefixUser);
+    }
+
+    /**
+     * 上传文件通用方法
+     * @param file 上传的原始文件
+     * @param filePath 保存文件路径
+     * @return
+     * @throws IOException
+     */
+    private Map<String, String> uploadFileMethod(MultipartFile file, String filePath) throws IOException {
         log.info("========================上传附件开始=========================");
         String fileName = "";
         BufferedOutputStream out = null;
         Map<String, String> resultMap = new HashMap<>();
         File create_file = null;
         if (!file.isEmpty()) {
-            File rootFile = new File(fielPrefix);
+            File rootFile = new File(filePath);
             if (!rootFile.exists()) {
                 rootFile.mkdir();
             }
             fileName = file.getOriginalFilename();
-            create_file = new File(fielPrefix + fileName);
+            create_file = new File(filePath + fileName);
             out = new BufferedOutputStream(new FileOutputStream(create_file));
             out.write(file.getBytes());
             out.flush();
@@ -49,7 +68,7 @@ public class UploadService {
             //path是/usr/local/src/view-service/attachment/
             //如果是windows系统，上传路径一般是 D:\software\nginx_win.rar,所以只需要soft..后的内容
             //否则就默认是linux系统,上传路径为/usr/local/src/view-service/attachment/filename 所以只需要usr以后的内容,并且不需要转换符号
-            if (System.getProperty("os.name").startsWith("win")) {
+            if (System.getProperty("os.name").startsWith("Win")) {
                 resultMap.put("fileAddr", filePrefixMapping + path.substring(path.indexOf("\\") + 1).replace("\\", "/"));
             } else {
                 resultMap.put("fileAddr", filePrefixMapping + path.substring(1));
@@ -64,16 +83,20 @@ public class UploadService {
         BufferedOutputStream out = null;
         Map<String, Object> paramsMap = new HashMap<>();
         Map<String, Object> resultMap = new HashMap<>();
-        File rootFile = new File(fielPrefix + "content");
+        File rootFile = new File(filePrefixContent);
         if (!rootFile.exists()) {
             rootFile.mkdirs();
         }
         fileName = file.getOriginalFilename();
-        File create_file = new File(fielPrefix + "content/" + fileName);
+        File create_file = new File(filePrefixContent + fileName);
         String path = create_file.getPath();
         paramsMap.put("file_name", create_file.getName());
         paramsMap.put("file_path", path);
-        paramsMap.put("file_addr", filePrefixMapping + path.substring(path.indexOf("\\") + 1));
+        if (System.getProperty("os.name").startsWith("Win")) {
+            paramsMap.put("file_addr", filePrefixMapping + path.substring(path.indexOf("\\") + 1));
+        } else {
+            paramsMap.put("file_addr", filePrefixMapping + path.substring(1));
+        }
         paramsMap.put("type", 0);
         paramsMap.put("position", 0);
         int result = uploadMapper.saveContentPicture(paramsMap);
@@ -84,7 +107,7 @@ public class UploadService {
             out.close();
             resultMap.put("success", 1);
             resultMap.put("message", "上传成功");
-            if (System.getProperty("os.name").startsWith("win")) {
+            if (System.getProperty("os.name").startsWith("Win")) {
                 resultMap.put("url", filePrefixMapping + path.substring(path.indexOf("\\") + 1).replace("\\", "/"));
             } else {
                 resultMap.put("url", filePrefixMapping + path.substring(1));

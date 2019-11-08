@@ -5,6 +5,8 @@ import com.synway.pojo.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 public class UserService {
     @Autowired
@@ -18,6 +20,10 @@ public class UserService {
     public User getUserByLoginInfo(String username,String password){
         User user = userMapper.getUserByLoginInfo(username,password);
         return user;
+    }
+
+    public int saveUser(Map<String,Object> params){
+        return userMapper.saveUser(params);
     }
 
 }

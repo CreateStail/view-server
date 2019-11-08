@@ -1,12 +1,17 @@
 package com.synway.controller;
 
+import cn.hutool.captcha.CaptchaUtil;
+import cn.hutool.captcha.LineCaptcha;
+import cn.hutool.core.codec.Base64;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.SecureUtil;
 import com.synway.pojo.User;
 import com.synway.service.UserService;
+import com.synway.utils.CaptchaUtils;
 import com.synway.utils.JsonData;
 import com.synway.utils.JwtUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.IncorrectCredentialsException;
-import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -17,6 +22,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Map;
+import java.util.UUID;
 
 
 @RestController
@@ -83,5 +96,48 @@ public class UserController {
     public JsonData unauthorized() {
         return JsonData.buildError(401, "Unauthorized", null);
     }
+
+    @GetMapping("/generateValidateCode")
+    public JsonData generateValidateCode(HttpServletResponse response) throws IOException {
+        //验证码token存入cookie
+        String tokenId = UUID.randomUUID().toString();
+        Cookie cookie = new Cookie("imgCodeToken",tokenId);
+        cookie.setPath("/");
+        response.addCookie(cookie);
+
+        //定义图形验证码的长和宽
+        String lineCaptcha = CaptchaUtils.createLineCaptcha();
+        //凭证信息可保存到redis
+        return JsonData.buildSuccess("加载验证图片成功","data:image/png;base64," + lineCaptcha);
+    }
+
+    /**
+     * @param params
+     * @return
+     */
+    @PostMapping("/saveUser")
+    public JsonData saveUser(@RequestParam Map<String,Object> params,
+                             HttpServletRequest request){
+        String verifyInput = String.valueOf(params.get("verifyInput"));
+        String password = String.valueOf(params.get("password"));
+        params.put("password", SecureUtil.md5(password));
+        //TODO 这里不太清楚是如何维护的,如果遇到高并发情况是否会有问题?
+        boolean verifyResult = CaptchaUtils.verifyCapcha(verifyInput);
+        int saveResult = 0;
+        if(verifyResult){
+            saveResult = userService.saveUser(params);
+            if(saveResult > 0){
+                return JsonData.buildSuccess("用户注册成功");
+            }else{
+                return JsonData.buildError("用户注册失败");
+            }
+        }else{
+            return  JsonData.buildError("验证码校验错误");
+        }
+    }
+
+
+
+
 
 }

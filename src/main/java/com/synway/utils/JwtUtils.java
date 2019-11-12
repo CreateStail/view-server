@@ -5,12 +5,15 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.synway.pojo.Role;
 import com.synway.pojo.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * jwt工具类
@@ -26,7 +29,7 @@ public class JwtUtils {
     /**
      * 生成jwt
      */
-    public static String getJsonWebToken(User user){
+    public static String getJsonWebToken(User user, Role role){
         if(user == null||user.getId()==null||user.getName()==null){
             return null;
         }else{
@@ -43,6 +46,8 @@ public class JwtUtils {
                                 .withSubject(SUBJECT)
                                 .withClaim("id",user.getId())
                                 .withClaim("name",user.getName())
+                                .withClaim("role",role.getRole())
+                                .withClaim("permission",role.getPermission())
                                 .withIssuedAt(new Date())
                                 .withExpiresAt(new Date(System.currentTimeMillis()+EXPIRE))
                                 .sign(Algorithm.HMAC256(APPSECRET));
@@ -113,6 +118,21 @@ public class JwtUtils {
         } catch (JWTDecodeException e) {
             logger.error("获取token，用户id失败:"+e);
             return 0;
+        }
+    }
+
+    public static Map<String,Object> getUserRole(String token){
+        Map<String,Object> resultMap = new HashMap<>();
+        try {
+            DecodedJWT jwt = JWT.decode(token);
+            resultMap.put("id",jwt.getClaim("id").asInt());
+            resultMap.put("name",jwt.getClaim("name").asString());
+            resultMap.put("role",jwt.getClaim("role").asString());
+            resultMap.put("permission",jwt.getClaim("permission").asString());
+            return resultMap;
+        } catch (JWTDecodeException e) {
+            logger.error("获取token，用户角色信息失败:"+e);
+            return resultMap;
         }
     }
 

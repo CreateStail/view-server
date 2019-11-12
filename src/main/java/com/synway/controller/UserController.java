@@ -1,10 +1,7 @@
 package com.synway.controller;
 
-import cn.hutool.captcha.CaptchaUtil;
-import cn.hutool.captcha.LineCaptcha;
-import cn.hutool.core.codec.Base64;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
+import com.synway.pojo.Role;
 import com.synway.pojo.User;
 import com.synway.service.UserService;
 import com.synway.utils.CaptchaUtils;
@@ -27,7 +24,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Map;
 import java.util.UUID;
 
@@ -43,10 +39,21 @@ public class UserController {
 
     @PostMapping("/login")
     public JsonData login(@RequestParam String username,
-                          @RequestParam String password){
+                          @RequestParam String password,
+                          HttpServletResponse response){
         User user = userService.getUserByLoginInfo(username,password);
         if(user != null){
-            return JsonData.buildSuccess("登录成功", JwtUtils.getJsonWebToken(user));
+            //TODO 登录成功用户名和头像从cookie中获取(分布式部署的话不知道会不会有问题,
+            // 可在nginx用ip_hash解决，或者请求用户信息)
+            Cookie name_cookie = new Cookie("userName",user.getName());
+            name_cookie.setPath("/");
+            response.addCookie(name_cookie);
+            Cookie img_cookie = new Cookie("headImg",user.getHeadImg());
+            img_cookie.setPath("/");
+            response.addCookie(img_cookie);
+            //查询用户权限
+            Role role = userService.getRoleById(user.getId());
+            return JsonData.buildSuccess("登录成功", JwtUtils.getJsonWebToken(user,role));
         }else{
             throw new IncorrectCredentialsException();
         }
@@ -59,11 +66,16 @@ public class UserController {
     public JsonData article(){
         Subject subject = SecurityUtils.getSubject();
         if(subject.isAuthenticated()){
-            return JsonData.buildSuccess("已登录");
+            Map<String, Object> userRole = JwtUtils.getUserRole(subject.getPrincipal().toString());
+            return JsonData.buildSuccess("已登录",userRole);
         }else {
             return JsonData.buildError("游客");
         }
     }
+
+    /**
+     *
+     */
 
     /**
      * @RequiresAuthentication 注解需要带有token，否则进入不了API
@@ -74,6 +86,8 @@ public class UserController {
     public JsonData requireAuth(){
         return JsonData.buildSuccess("已鉴明身份");
     }
+
+
 
     /**
      * @RequiresRoles 与值不符合会报错
@@ -123,10 +137,9 @@ public class UserController {
         params.put("password", SecureUtil.md5(password));
         //TODO 这里不太清楚是如何维护的,如果遇到高并发情况是否会有问题?
         boolean verifyResult = CaptchaUtils.verifyCapcha(verifyInput);
-        int saveResult = 0;
         if(verifyResult){
-            saveResult = userService.saveUser(params);
-            if(saveResult > 0){
+            boolean result = userService.saveUser(params);
+            if(result){
                 return JsonData.buildSuccess("用户注册成功");
             }else{
                 return JsonData.buildError("用户注册失败");

@@ -11,10 +11,17 @@
     </select>
     
     <select id="getUserByLoginInfo" resultType="com.synway.pojo.User" parameterType="String">
-        select id,name from t_user where name = #{username} and password = #{password}
+        select id,name,headImg from t_user where name = #{username} and password = #{password}
+    </select>
+
+    <select id="getRoleById" resultType="com.synway.pojo.Role" parameterType="int">
+        select role,permission from t_role where user_id = #{_parameter}
     </select>
 
     <insert id="saveUser" parameterType="Map">
+        <selectKey keyProperty="userId" resultType="int" order="AFTER">
+            select last_insert_id()
+        </selectKey>
         insert into t_user(name,password
         <if test="headImg != null and headImg != ''">
             ,headImg
@@ -39,4 +46,8 @@
         )
     </insert>
 
+    <insert id="saveRole" parameterType="map">
+        insert into t_role(user_id,role,permission)
+        VALUES (#{userId},#{role},#{permission})
+    </insert>
 </mapper>

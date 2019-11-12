@@ -31,12 +31,9 @@ public class ShiroConfig {
          filterMap.put("jwt", new JWTFilter());
          factoryBean.setFilters(filterMap);
          factoryBean.setSecurityManager(securityManager);
-
          // 设置无权限时跳转的 url;
-         factoryBean.setUnauthorizedUrl("/unauthorized/无权限");
          Map<String, String> filterRuleMap = new HashMap<>();
          //访问/login和/unauthorized 不需要经过过滤器
-         filterRuleMap.put("/login", "anon");
          filterRuleMap.put("/unauthorized/**", "anon");
          // 所有请求通过我们自己的JWT Filter
          filterRuleMap.put("/**", "jwt");
@@ -48,7 +45,7 @@ public class ShiroConfig {
          filterRuleMap.put("/swagger-ui.html","anon");
          filterRuleMap.put("/webjars/**","anon");
          // 访问 /unauthorized/** 不通过JWTFilter
-         filterRuleMap.put("/view-server/Api/listThemeData","anon");
+         filterRuleMap.put("/view-server/Api/View/**","anon");
          factoryBean.setFilterChainDefinitionMap(filterRuleMap);
          return factoryBean;
      }

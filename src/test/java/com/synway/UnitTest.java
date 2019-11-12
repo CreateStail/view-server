@@ -1,10 +1,17 @@
 package com.synway;
 
+import cn.hutool.crypto.SecureUtil;
+import cn.hutool.crypto.digest.HMac;
+import cn.hutool.crypto.digest.MD5;
 import com.synway.utils.Aesssss;
+import com.synway.utils.CommonUtils;
 import org.junit.Test;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 
 public class UnitTest {
 
@@ -35,6 +42,12 @@ public class UnitTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void testMap(){
+        String str = SecureUtil.md5("789");
+        System.out.println(str);
     }
 
 }

@@ -1,5 +1,8 @@
 package com.synway.service;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.google.gson.Gson;
 import com.synway.dao.ViewMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +19,7 @@ import java.util.Map;
 @Service
 public class ViewService {
     private static final Logger log = LoggerFactory.getLogger(ViewService.class);
-
+    private static final Gson gson = new Gson();
     @Value("${file.prefix.mapping}")
     private String filePrefixMapping;
     @Autowired
@@ -164,6 +167,34 @@ public class ViewService {
         int business_id =  Integer.parseInt(resultMap.get("id").toString());
         List<Map<String, Object>> attachmentMap = viewMapper.getAttachmentByBusinessIdAndType(business_id,"实现代码");
         resultMap.put("attachmentMap",attachmentMap);
+        return resultMap;
+    }
+
+    public String listView(int pageSize,int page,String sort){
+        Map<String,Object> result = new HashMap<>();
+        PageHelper.startPage(page,pageSize,sort);
+        List<Map<String,Object>>  list = viewMapper.listView();
+        PageInfo pageInfo = new PageInfo(list);
+        result.put("rows",pageInfo.getList());
+        result.put("total",pageInfo.getTotal());
+        return gson.toJson(result);
+    }
+
+    public Map<String,Object> getThemeDetails(String themeId){
+        Map<String, Object> themeContent = viewMapper.getThemeContent(themeId);
+        Map<String, Object> backgroundContent = viewMapper.getBackgroundContent(themeId);
+        Map<String, Object> dataByThemeId = viewMapper.getDataByThemeId(themeId);
+        Map<String, Object> programByThemeId = viewMapper.getProgramByThemeId(themeId);
+        Map<String, Object> codeByThemeId = viewMapper.getCodeByThemeId(themeId);
+        String type = "1";
+        List<Map<String, Object>> fileByType = viewMapper.getFileByType(themeId, type);
+        Map<String,Object> resultMap = new HashMap<>();
+        resultMap.put("theme",themeContent);
+        resultMap.put("background",backgroundContent);
+        resultMap.put("data",dataByThemeId);
+        resultMap.put("program",programByThemeId);
+        resultMap.put("code",codeByThemeId);
+        resultMap.put("file",fileByType);
         return resultMap;
     }
 }

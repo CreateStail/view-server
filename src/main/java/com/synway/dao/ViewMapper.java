@@ -39,5 +39,8 @@ public interface ViewMapper {
     List<Map<String,Object>> getAttachmentByBusinessIdAndType(@Param("business_id")int business_id,
                                                               @Param("business_name")String business_name);
 
+    List<Map<String,Object>> listView();
 
+    List<Map<String,Object>> getFileByType(@Param("themeId") String themeId,
+                                           @Param("type") String type);
 }

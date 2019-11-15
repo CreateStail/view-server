@@ -36,7 +36,7 @@
             select last_insert_id()
         </selectKey>
         insert into t_background(theme_id
-        <if test="background_content != null and background_content != ''">
+        <if test="background != null and background != ''">
             ,background_content
         </if>
         <if test="background_html != null and background_html != ''">
@@ -45,7 +45,7 @@
         )
         VALUES
         (#{theme_id}
-        <if test="background_content != null and background_content != ''">
+        <if test="background != null and background != ''">
             ,#{background}
         </if>
         <if test="background_html != null and background_html != ''">
@@ -127,11 +127,11 @@
     </select>
 
     <select id="getThemeContent" parameterType="map" resultType="map">
-        select id,theme,theme_pic,introduction_html from t_theme where is_delete = 0 and id=#{theme_id}
+        select id,theme,theme_pic,introduction_html,introduction_content from t_theme where is_delete = 0 and id=#{theme_id}
     </select>
 
     <select id="getBackgroundContent" parameterType="map" resultType="map">
-        select t.theme_pic,b.background_html,b.id from t_theme t left join t_background b on t.id = b.theme_id
+        select t.theme_pic,b.background_html,b.id,b.background_content from t_theme t left join t_background b on t.id = b.theme_id
         where is_delete = 0 and t.id=#{theme_id}
     </select>
 
@@ -167,6 +167,15 @@
         and is_delete = 0 and business_name = #{business_name}
     </select>
 
+    <select id = "listView" resultType="map">
+       select id,theme,user_name,
+           date_format(create_time,'%Y-%m-%d %h:%i:%s') as create_time,
+           date_format(update_time,'%Y-%m-%d %h:%i:%s') as update_time from t_theme where is_delete = '0'
+    </select>
 
+    <select id="getFileByType" parameterType="String" resultType="map">
+        select business_id,business_name,file_name,file_path,file_addr from t_file
+        where is_delete = '0' and type = #{type} and theme_id = #{themeId}
+    </select>
 </mapper>
 

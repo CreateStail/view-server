@@ -74,10 +74,6 @@ public class UserController {
     }
 
     /**
-     *
-     */
-
-    /**
      * @RequiresAuthentication 注解需要带有token，否则进入不了API
      * @return
      */
@@ -118,7 +114,6 @@ public class UserController {
         Cookie cookie = new Cookie("imgCodeToken",tokenId);
         cookie.setPath("/");
         response.addCookie(cookie);
-
         //定义图形验证码的长和宽
         String lineCaptcha = CaptchaUtils.createLineCaptcha();
         //凭证信息可保存到redis

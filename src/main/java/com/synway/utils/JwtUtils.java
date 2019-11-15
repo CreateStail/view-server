@@ -30,7 +30,7 @@ public class JwtUtils {
      * 生成jwt
      */
     public static String getJsonWebToken(User user, Role role){
-        if(user == null||user.getId()==null||user.getName()==null){
+        if(user == null||user.getId()==null||user.getName()==null||role == null){
             return null;
         }else{
 /*            String token = Jwts.builder().setSubject(SUBJECT)

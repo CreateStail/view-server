@@ -1,14 +1,13 @@
 package com.synway.controller;
 
+import com.github.pagehelper.PageHelper;
+import com.google.gson.Gson;
 import com.synway.service.ViewService;
 import com.synway.utils.JsonData;
 import com.synway.utils.JwtUtils;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -99,6 +98,24 @@ public class ViewController {
             return JsonData.buildSuccess("查询代码内容成功-----主题id:"+theme_id,codeContent);
         }else{
             return JsonData.buildError("查询代码内容-----主题id:"+theme_id+"失败");
+        }
+    }
+
+    @GetMapping("/listView")
+    @RequiresRoles("admin")
+    public String listView(@RequestParam int pageSize,
+                           @RequestParam int page,String sort,String order){
+        return  viewService.listView(pageSize,page,sort+" "+order);
+    }
+
+    @PostMapping("/getThemeDetails")
+    @RequiresRoles("admin")
+    public JsonData getThemeDetails(@RequestParam String themeId){
+        Map<String, Object> themeDetails = viewService.getThemeDetails(themeId);
+        if(themeDetails != null){
+            return JsonData.buildSuccess("查询主题详情成功",themeDetails);
+        }else{
+            return JsonData.buildError("查询主题详情失败");
         }
     }
 }

@@ -118,4 +118,14 @@ public class ViewController {
             return JsonData.buildError("查询主题详情失败");
         }
     }
+
+    @PostMapping("/delFile")
+    public JsonData delFile(@RequestParam int id){
+        boolean result = viewService.delFile(id);
+        if(result){
+            return JsonData.buildSuccess("删除附件成功");
+        }else{
+            return JsonData.buildError("删除附件失败");
+        }
+    }
 }

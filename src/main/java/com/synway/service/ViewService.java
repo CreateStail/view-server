@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,42 +34,11 @@ public class ViewService {
     @Transactional(rollbackFor = Exception.class)
     public boolean saveThemeContent(Map<String, Object> params, MultipartFile templeteFile) {
         try {
-            params.put("theme_id", null);
-            params.put("background_id", null);
-            params.put("data_id", null);
-            params.put("program_id", null);
-            params.put("code_id", null);
-            params.put("type", 1);
-            //读取Excel模板中的值
-            List<Map<String, Object>> templeteList = null;
-            if (templeteFile != null) {
-                templeteList = uploadService.listTempleteData(templeteFile);
-            }
-            int introductionCount = viewMapper.saveIntroduction(params);
-            if (!"".equals(params.get("themePic_Name")) && introductionCount > 0) {
-                params = saveFile("themePic_", params, (int) params.get("theme_id"), "主题图片");
-                viewMapper.saveFile(params);
-            }
-            int backgroundCount = viewMapper.saveBackground(params);
-
-            int dataCount = viewMapper.saveData(params);
-            if (!"".equals(params.get("themeData_Name")) && dataCount > 0) {
-                params = saveFile("themeData_", params, (int) params.get("data_id"), "数据集");
-                viewMapper.saveFile(params);
-            }
-            int programCount = viewMapper.saveProgram(params);
-            if (!"".equals(params.get("themeProgram_Name")) && programCount > 0) {
-                params = saveFile("themeProgram_", params, (int) params.get("program_id"), "技术方案");
-                viewMapper.saveFile(params);
-            }
-            int codeCount = viewMapper.saveCode(params);
-            if (!"".equals(params.get("themeCode_Name")) && codeCount > 0) {
-                params = saveFile("themeCode_", params, (int) params.get("code_id"), "实现代码");
-                viewMapper.saveFile(params);
-            }
-            //保存模板附件方法
-            if (templeteList != null && templeteList.size() > 0) {
-                saveTempleteFile(templeteList, params);
+            String pageType = String.valueOf(params.get("pageType"));
+            if("add".equals(pageType)){
+                doSave(params,templeteFile);
+            }else if("edit".equals(pageType)){
+                doUpdate(params,templeteFile);
             }
         } catch (Exception e) {
             log.error("保存主题失败", e);
@@ -76,6 +46,53 @@ public class ViewService {
         }
         return true;
     }
+
+    /**
+     * 保存方法实现
+     * @param params
+     * @param templeteFile
+     */
+    private void doSave(Map<String, Object> params, MultipartFile templeteFile){
+        params.put("theme_id", null);
+        params.put("background_id", null);
+        params.put("data_id", null);
+        params.put("program_id", null);
+        params.put("code_id", null);
+        params.put("type", 1);
+        //读取Excel模板中的值
+        List<Map<String, Object>> templeteList = null;
+        if (templeteFile != null) {
+            templeteList = uploadService.listTempleteData(templeteFile);
+        }
+        int introductionCount = viewMapper.saveIntroduction(params);
+        if (!"".equals(params.get("themePic_Name")) && introductionCount > 0) {
+            params = saveFile("themePic_", params, (int) params.get("theme_id"), "主题图片");
+            viewMapper.saveFile(params);
+        }
+        int backgroundCount = viewMapper.saveBackground(params);
+
+        int dataCount = viewMapper.saveData(params);
+        if (!"".equals(params.get("themeData_Name")) && dataCount > 0) {
+            params = saveFile("themeData_", params, (int) params.get("data_id"), "数据集");
+            viewMapper.saveFile(params);
+        }
+        int programCount = viewMapper.saveProgram(params);
+        if (!"".equals(params.get("themeProgram_Name")) && programCount > 0) {
+            params = saveFile("themeProgram_", params, (int) params.get("program_id"), "技术方案");
+            viewMapper.saveFile(params);
+        }
+        int codeCount = viewMapper.saveCode(params);
+        if (!"".equals(params.get("themeCode_Name")) && codeCount > 0) {
+            params = saveFile("themeCode_", params, (int) params.get("code_id"), "实现代码");
+            viewMapper.saveFile(params);
+        }
+        //保存模板附件方法
+        if (templeteList != null && templeteList.size() > 0) {
+            saveTempleteFile(templeteList, params);
+        }
+    }
+
+
 
     private Map<String, Object> saveFile(String type,
                                          Map<String, Object> params,
@@ -197,4 +214,54 @@ public class ViewService {
         resultMap.put("file",fileByType);
         return resultMap;
     }
+
+    public boolean delFile(int id){
+        int result = viewMapper.delFileById(id);
+        if(result > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    /**
+     * 实现更新方法
+     * 由于各模块如主题和背景间还未存在一对多关系
+     * 所以更新使用主题id更新条件
+     * @param params
+     */
+    private void doUpdate(Map<String,Object> params, MultipartFile templeteFile){
+        params.put("update_time",new Date());
+        viewMapper.updateTheme(params);
+        viewMapper.updateBackground(params);
+        viewMapper.updateData(params);
+        viewMapper.updateCode(params);
+        viewMapper.updateProgram(params);
+        if (!"".equals(params.get("themePic_Name"))) {
+            params = saveFile("themePic_", params, (int) params.get("theme_id"), "主题图片");
+            viewMapper.saveFile(params);
+        }
+        if (!"".equals(params.get("themeData_Name"))) {
+            params = saveFile("themeData_", params, (int) params.get("data_id"), "数据集");
+            viewMapper.saveFile(params);
+        }
+        if (!"".equals(params.get("themeProgram_Name"))) {
+            params = saveFile("themeProgram_", params, (int) params.get("program_id"), "技术方案");
+            viewMapper.saveFile(params);
+        }
+        if (!"".equals(params.get("themeCode_Name"))) {
+            params = saveFile("themeCode_", params, (int) params.get("code_id"), "实现代码");
+            viewMapper.saveFile(params);
+        }
+        //读取Excel模板中的值
+        List<Map<String, Object>> templeteList = null;
+        if (templeteFile != null) {
+            templeteList = uploadService.listTempleteData(templeteFile);
+        }
+        //保存模板附件方法
+        if (templeteList != null && templeteList.size() > 0) {
+            saveTempleteFile(templeteList, params);
+        }
+    }
+
 }

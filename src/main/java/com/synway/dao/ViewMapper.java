@@ -43,4 +43,19 @@ public interface ViewMapper {
 
     List<Map<String,Object>> getFileByType(@Param("themeId") String themeId,
                                            @Param("type") String type);
+
+    int delFileById(int id);
+
+    int updateTheme(Map<String,Object> params);
+
+    int updateBackground(Map<String,Object> params);
+
+    int updateData(Map<String,Object> params);
+
+    int updateProgram(Map<String,Object> params);
+
+    int updateCode(Map<String,Object> params);
+
+
+
 }

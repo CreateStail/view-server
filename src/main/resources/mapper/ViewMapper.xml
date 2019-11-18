@@ -174,8 +174,40 @@
     </select>
 
     <select id="getFileByType" parameterType="String" resultType="map">
-        select business_id,business_name,file_name,file_path,file_addr from t_file
+        select id,business_id,business_name,file_name,file_path,file_addr from t_file
         where is_delete = '0' and type = #{type} and theme_id = #{themeId}
     </select>
+    
+    <update id="delFileById" parameterType="int">
+        update t_file set is_delete='1' where id = #{id}
+    </update>
+    
+    <update id="updateTheme" parameterType="map">
+        update t_theme
+        set
+        <trim suffixOverrides=",">
+          <if test="theme != null amd theme != ''">
+              theme = #{theme},
+          </if>
+          <if test="themePic_Path !=null and themePic_Path != ''">
+             theme_pic = #{themePic_Path},
+          </if>
+          <if test="introduction_html != null and introduction_html != ''">
+              introduction_html = #{introduction_html},
+          </if>
+          <if test="introduction != null and introduction != ''">
+              introduction_content = #{introduction},
+          </if>
+          <if test="xgr != null and xgr != ''">
+              xgr = #{user_id},
+          </if>
+          <if test="xgr_name != null and xgr_name != ''">
+              xgr_name = #{user_name},
+          </if>
+          <if test="update_time != null and update_time != ''">
+              update_time = #{update_time},
+          </if>
+        </trim>
+    </update>
 </mapper>
 

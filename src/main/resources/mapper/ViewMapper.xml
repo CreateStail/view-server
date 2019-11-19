@@ -186,7 +186,7 @@
         update t_theme
         set
         <trim suffixOverrides=",">
-          <if test="theme != null amd theme != ''">
+          <if test="theme != null and theme != ''">
               theme = #{theme},
           </if>
           <if test="themePic_Path !=null and themePic_Path != ''">
@@ -204,10 +204,31 @@
           <if test="xgr_name != null and xgr_name != ''">
               xgr_name = #{user_name},
           </if>
-          <if test="update_time != null and update_time != ''">
-              update_time = #{update_time},
-          </if>
+              update_time = #{update_time}
         </trim>
+        <where>
+            id = #{theme_id} and is_delete = '0'
+        </where>
+    </update>
+
+    <update id="updateBackground" parameterType="map">
+        update t_background
+        set
+        <trim suffixOverrides=",">
+            <if test="background != null and backgroun != ''">
+                background_content = #{background},
+            </if>
+            <if test="background_html != null and background_html != ''">
+                background_html = #{background_html}
+            </if>
+        </trim>
+        <where>
+            id = #{background_id}
+        </where>
+    </update>
+
+    <update id="delThemeById" parameterType="int">
+        update t_theme set is_delete = '1' where id = #{id}
     </update>
 </mapper>
 

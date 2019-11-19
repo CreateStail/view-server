@@ -128,4 +128,14 @@ public class ViewController {
             return JsonData.buildError("删除附件失败");
         }
     }
+
+    @GetMapping("/delTheme")
+    public JsonData delTheme(@RequestParam int id){
+        boolean result = viewService.delTheme(id);
+        if(result){
+            return JsonData.buildSuccess("删除主题成功");
+        }else{
+            return JsonData.buildError("删除主题失败");
+        }
+    }
 }

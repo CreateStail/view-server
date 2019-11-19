@@ -1,5 +1,7 @@
 package com.synway.service;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.gson.Gson;
@@ -103,6 +105,7 @@ public class ViewService {
         params.put("file_name", params.get(type + "Name"));
         params.put("file_path", params.get(type + "Path"));
         params.put("file_addr", params.get(type + "Addr"));
+        params.put("type",1);
         params.put("position", 0);
         return params;
     }
@@ -233,24 +236,28 @@ public class ViewService {
     private void doUpdate(Map<String,Object> params, MultipartFile templeteFile){
         params.put("update_time",new Date());
         viewMapper.updateTheme(params);
+        //封装模块id
+        encapsulationModalId(params);
+
         viewMapper.updateBackground(params);
-        viewMapper.updateData(params);
+        //数据集,技术方案,代码实现目前只有附件没有内容,故不在此更新
+/*        viewMapper.updateData(params);
         viewMapper.updateCode(params);
-        viewMapper.updateProgram(params);
+        viewMapper.updateProgram(params);*/
         if (!"".equals(params.get("themePic_Name"))) {
-            params = saveFile("themePic_", params, (int) params.get("theme_id"), "主题图片");
+            params = saveFile("themePic_", params, Integer.parseInt(params.get("theme_id").toString()), "主题图片");
             viewMapper.saveFile(params);
         }
         if (!"".equals(params.get("themeData_Name"))) {
-            params = saveFile("themeData_", params, (int) params.get("data_id"), "数据集");
+            params = saveFile("themeData_", params, Integer.parseInt(params.get("data_id").toString()), "数据集");
             viewMapper.saveFile(params);
         }
         if (!"".equals(params.get("themeProgram_Name"))) {
-            params = saveFile("themeProgram_", params, (int) params.get("program_id"), "技术方案");
+            params = saveFile("themeProgram_", params, Integer.parseInt(params.get("program_id").toString()), "技术方案");
             viewMapper.saveFile(params);
         }
         if (!"".equals(params.get("themeCode_Name"))) {
-            params = saveFile("themeCode_", params, (int) params.get("code_id"), "实现代码");
+            params = saveFile("themeCode_", params, Integer.parseInt(params.get("code_id").toString()), "实现代码");
             viewMapper.saveFile(params);
         }
         //读取Excel模板中的值
@@ -261,6 +268,28 @@ public class ViewService {
         //保存模板附件方法
         if (templeteList != null && templeteList.size() > 0) {
             saveTempleteFile(templeteList, params);
+        }
+    }
+
+    private void encapsulationModalId(Map<String,Object> params){
+        String business_ids = String.valueOf(params.get("business_ids"));
+        JSONObject jsonObject = JSONObject.parseObject(business_ids);
+        String background_id = String.valueOf(jsonObject.get("background_id"));
+        String data_id = String.valueOf(jsonObject.get("data_id"));
+        String program_id = String.valueOf(jsonObject.get("program_id"));
+        String code_id = String.valueOf(jsonObject.get("code_id"));
+        params.put("background_id",background_id);
+        params.put("data_id",data_id);
+        params.put("program_id",program_id);
+        params.put("code_id",code_id);
+    }
+
+    public boolean delTheme(int id){
+        int result = viewMapper.delThemeById(id);
+        if(result > 0){
+            return true;
+        }else{
+            return false;
         }
     }
 

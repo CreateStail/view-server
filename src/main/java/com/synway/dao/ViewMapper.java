@@ -56,6 +56,6 @@ public interface ViewMapper {
 
     int updateCode(Map<String,Object> params);
 
-
+    int delThemeById(int id);
 
 }

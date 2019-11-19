@@ -30,22 +30,21 @@ public class ViewService {
     @Autowired
     private UploadService uploadService;
 
-    /**
-     * TODO 这里事务未实现，回头再来看看
-     */
+
     @Transactional(rollbackFor = Exception.class)
     public boolean saveThemeContent(Map<String, Object> params, MultipartFile templeteFile) {
-        try {
+//        try {
             String pageType = String.valueOf(params.get("pageType"));
             if("add".equals(pageType)){
                 doSave(params,templeteFile);
             }else if("edit".equals(pageType)){
                 doUpdate(params,templeteFile);
             }
-        } catch (Exception e) {
-            log.error("保存主题失败", e);
-            return false;
-        }
+//        } catch (Exception e) {
+//            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+//            log.error("保存主题失败", e);
+//            return false;
+//        }
         return true;
     }
 

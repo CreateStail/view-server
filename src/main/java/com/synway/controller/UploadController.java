@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -63,4 +64,14 @@ public class UploadController {
         }
         return JsonData.buildError("上传失败");
     }
+
+    /**
+     * 实现批量上传文件功能
+     */
+    public JsonData uploadFiles(List<MultipartFile> fileList){
+
+        return JsonData.buildSuccess();
+    }
+
+
 }

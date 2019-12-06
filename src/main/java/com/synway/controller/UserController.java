@@ -40,21 +40,21 @@ public class UserController {
     @PostMapping("/login")
     public JsonData login(@RequestParam String username,
                           @RequestParam String password,
-                          HttpServletResponse response){
-        User user = userService.getUserByLoginInfo(username,password);
-        if(user != null){
+                          HttpServletResponse response) {
+        User user = userService.getUserByLoginInfo(username, password);
+        if (user != null) {
             //TODO 登录成功用户名和头像从cookie中获取(分布式部署的话不知道会不会有问题,
             // 可在nginx用ip_hash解决，或者请求用户信息)
-            Cookie name_cookie = new Cookie("userName",user.getName());
+            Cookie name_cookie = new Cookie("userName", user.getName());
             name_cookie.setPath("/");
             response.addCookie(name_cookie);
-            Cookie img_cookie = new Cookie("headImg",user.getHeadImg());
+            Cookie img_cookie = new Cookie("headImg", user.getHeadImg());
             img_cookie.setPath("/");
             response.addCookie(img_cookie);
             //查询用户权限
             Role role = userService.getRoleById(user.getId());
-            return JsonData.buildSuccess("登录成功", JwtUtils.getJsonWebToken(user,role));
-        }else{
+            return JsonData.buildSuccess("登录成功", JwtUtils.getJsonWebToken(user, role));
+        } else {
             throw new IncorrectCredentialsException();
         }
     }
@@ -63,40 +63,39 @@ public class UserController {
      * 用来判断用户是否存在，是否已登录
      */
     @GetMapping("/article")
-    public JsonData article(){
+    public JsonData article() {
         Subject subject = SecurityUtils.getSubject();
-        if(subject.isAuthenticated()){
+        if (subject.isAuthenticated()) {
             Map<String, Object> userRole = JwtUtils.getUserRole(subject.getPrincipal().toString());
-            return JsonData.buildSuccess("已登录",userRole);
-        }else {
+            return JsonData.buildSuccess("已登录", userRole);
+        } else {
             return JsonData.buildError("游客");
         }
     }
 
     /**
-     * @RequiresAuthentication 注解需要带有token，否则进入不了API
      * @return
+     * @RequiresAuthentication 注解需要带有token，否则进入不了API
      */
     @GetMapping("/require_auth")
     @RequiresAuthentication
-    public JsonData requireAuth(){
+    public JsonData requireAuth() {
         return JsonData.buildSuccess("已鉴明身份");
     }
 
 
-
     /**
-     * @RequiresRoles 与值不符合会报错
      * @return
+     * @RequiresRoles 与值不符合会报错
      */
     @GetMapping("/reqire_role")
     @RequiresRoles("admin")
-    public JsonData requireRole(){
+    public JsonData requireRole() {
         return JsonData.buildSuccess("管理员角色");
     }
 
     @GetMapping("/require_permission")
-    @RequiresPermissions(logical = Logical.AND,value = {"view","edit"})
+    @RequiresPermissions(logical = Logical.AND, value = {"view", "edit"})
     public JsonData requirePermission() {
         return JsonData.buildSuccess("You are visiting permission require edit,view", null);
     }
@@ -111,13 +110,13 @@ public class UserController {
     public JsonData generateValidateCode(HttpServletResponse response) throws IOException {
         //验证码token存入cookie
         String tokenId = UUID.randomUUID().toString();
-        Cookie cookie = new Cookie("imgCodeToken",tokenId);
+        Cookie cookie = new Cookie("imgCodeToken", tokenId);
         cookie.setPath("/");
         response.addCookie(cookie);
         //定义图形验证码的长和宽
         String lineCaptcha = CaptchaUtils.createLineCaptcha();
         //凭证信息可保存到redis
-        return JsonData.buildSuccess("加载验证图片成功","data:image/png;base64," + lineCaptcha);
+        return JsonData.buildSuccess("加载验证图片成功", "data:image/png;base64," + lineCaptcha);
     }
 
     /**
@@ -125,27 +124,30 @@ public class UserController {
      * @return
      */
     @PostMapping("/saveUser")
-    public JsonData saveUser(@RequestParam Map<String,Object> params,
-                             HttpServletRequest request){
+    public JsonData saveUser(@RequestParam Map<String, Object> params,
+                             HttpServletRequest request) {
         String verifyInput = String.valueOf(params.get("verifyInput"));
         String password = String.valueOf(params.get("password"));
         params.put("password", SecureUtil.md5(password));
         //TODO 这里不太清楚是如何维护的,如果遇到高并发情况是否会有问题?
         boolean verifyResult = CaptchaUtils.verifyCapcha(verifyInput);
-        if(verifyResult){
+        if (verifyResult) {
             boolean result = userService.saveUser(params);
-            if(result){
+            if (result) {
                 return JsonData.buildSuccess("用户注册成功");
-            }else{
+            } else {
                 return JsonData.buildError("用户注册失败");
             }
-        }else{
-            return  JsonData.buildError("验证码校验错误");
+        } else {
+            return JsonData.buildError("验证码校验错误");
         }
     }
 
-
-
+    @GetMapping("/listUser")
+    @RequiresRoles(value = "admin")
+    public Map<String,Object> listUser(@RequestParam Map<String, Object> params) {
+        return userService.listUser(params);
+    }
 
 
 }

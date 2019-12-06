@@ -138,4 +138,10 @@ public class ViewController {
             return JsonData.buildError("删除主题失败");
         }
     }
+
+    @GetMapping("/getDefaultThemeId")
+    public JsonData getDefaultThemeId(){
+        String defaultThemeId = viewService.getDefaultThemeId();
+        return JsonData.buildSuccess(null,defaultThemeId);
+    }
 }

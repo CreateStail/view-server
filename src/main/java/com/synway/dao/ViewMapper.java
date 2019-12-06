@@ -58,4 +58,5 @@ public interface ViewMapper {
 
     int delThemeById(int id);
 
+    Map<String,Object> getDefaultThemeId();
 }

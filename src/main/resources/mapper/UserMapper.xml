@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.synway.dao.UserMapper">
     <select id="selectById" resultType="com.synway.pojo.User" parameterType="int">
         select id,name,headimg,phone,email,sex,create_time,state,lrr,lrr_name,update_time
@@ -9,7 +9,7 @@
         where
          id = #{id}
     </select>
-    
+
     <select id="getUserByLoginInfo" resultType="com.synway.pojo.User" parameterType="String">
         select id,name,headImg from t_user where name = #{username} and password = #{password}
     </select>
@@ -50,4 +50,9 @@
         insert into t_role(user_id,role,permission)
         VALUES (#{userId},#{role},#{permission})
     </insert>
+
+    <select id="listUser" parameterType="map" resultType="map">
+        select id,name,phone,email,sex,date_format(create_time,'%Y-%m-%d %h:%i:%s') as create_time,
+           date_format(update_time,'%Y-%m-%d %h:%i:%s') as update_time from t_user where state='0'
+    </select>
 </mapper>

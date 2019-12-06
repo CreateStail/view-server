@@ -3,6 +3,9 @@ package com.synway;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.digest.HMac;
 import cn.hutool.crypto.digest.MD5;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.synway.utils.Aesssss;
 import com.synway.utils.CommonUtils;
 import org.junit.Test;
@@ -46,8 +49,8 @@ public class UnitTest {
 
     @Test
     public void testMap(){
-        String str = SecureUtil.md5("789");
-        System.out.println(str);
+
+
     }
 
 }

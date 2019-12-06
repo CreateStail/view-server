@@ -116,6 +116,7 @@ public class ViewService {
         params.remove("file_path");
         params.remove("file_addr");
         params.remove("position");
+        params.remove("type");
         for (int i = 0; i < templeteList.size(); i++) {
             String business_name = String.valueOf(templeteList.get(i).get("business_name"));
             String file_name = String.valueOf(templeteList.get(i).get("file_name"));
@@ -130,6 +131,7 @@ public class ViewService {
                 params.put("file_addr", filePrefixMapping + file_path.substring(1));
             }
             params.put("position", "1");
+            params.put("type","1");
             switch (business_name) {
                 case "数据集":
                     params.put("business_id", params.get("data_id"));
@@ -290,6 +292,11 @@ public class ViewService {
         }else{
             return false;
         }
+    }
+
+    public String getDefaultThemeId(){
+        Map<String, Object> defaultThemeId = viewMapper.getDefaultThemeId();
+        return String.valueOf(defaultThemeId.get("id"));
     }
 
 }

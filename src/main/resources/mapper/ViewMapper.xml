@@ -230,5 +230,9 @@
     <update id="delThemeById" parameterType="int">
         update t_theme set is_delete = '1' where id = #{id}
     </update>
+
+    <select id="getDefaultThemeId" resultType="map">
+        SELECT id FROM t_theme ORDER BY id ASC limit 0,1;
+    </select>
 </mapper>
 

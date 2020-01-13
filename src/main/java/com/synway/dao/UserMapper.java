@@ -22,4 +22,10 @@ public interface UserMapper {
      Role getRoleById(int userId);
 
      List<User> listUser();
+
+     Map<String,Object> getUserInfoById(int id);
+
+     int updateUser(Map<String,Object> params);
+
+     int delUser(int id);
 }

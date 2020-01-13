@@ -24,6 +24,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -120,33 +121,74 @@ public class UserController {
     }
 
     /**
+     * TODO 用户信息提取方式修改
      * @param params
      * @return
      */
-    @PostMapping("/saveUser")
-    public JsonData saveUser(@RequestParam Map<String, Object> params,
-                             HttpServletRequest request) {
+    @PostMapping("/saveOrupdateUser")
+    public JsonData saveOrupdateUser(@RequestParam Map<String, Object> params,
+                                     HttpServletRequest request) {
         String verifyInput = String.valueOf(params.get("verifyInput"));
         String password = String.valueOf(params.get("password"));
+        String pageType = String.valueOf(params.get("pageType"));
         params.put("password", SecureUtil.md5(password));
+
+        String token = request.getHeader("token");
+        int user_id = JwtUtils.getUserId(token);
+        String user_name = JwtUtils.getUserName(token);
+        params.put("xgr", user_id);
+        params.put("xgr_name", user_name);
+        params.put("updateTime",new Date());
         //TODO 这里不太清楚是如何维护的,如果遇到高并发情况是否会有问题?
         boolean verifyResult = CaptchaUtils.verifyCapcha(verifyInput);
         if (verifyResult) {
-            boolean result = userService.saveUser(params);
-            if (result) {
-                return JsonData.buildSuccess("用户注册成功");
-            } else {
-                return JsonData.buildError("用户注册失败");
+            if ("add".equals(pageType)) {
+                boolean result = userService.saveUser(params);
+                if (result) {
+                    return JsonData.buildSuccess("用户注册成功");
+                } else {
+                    return JsonData.buildError("用户注册失败");
+                }
+            } else if ("edit".equals(pageType)) {
+                boolean result = userService.updateUser(params);
+                if (result) {
+                    return JsonData.buildSuccess("用户注册修改成功");
+                } else {
+                    return JsonData.buildError("用户注册修改失败");
+                }
             }
         } else {
             return JsonData.buildError("验证码校验错误");
         }
+        return null;
     }
 
     @GetMapping("/listUser")
     @RequiresRoles(value = "admin")
-    public Map<String,Object> listUser(@RequestParam Map<String, Object> params) {
+    public Map<String, Object> listUser(@RequestParam Map<String, Object> params) {
         return userService.listUser(params);
+    }
+
+    @GetMapping("/getUserInfoById")
+    @RequiresRoles(value = "admin")
+    public JsonData getUserInfoById(@RequestParam int id) {
+        Map<String, Object> userInfoById = userService.getUserInfoById(id);
+        if (userInfoById != null) {
+            return JsonData.buildSuccess("查询用户信息成功", userInfoById);
+        } else {
+            return JsonData.buildError("查询用户信息失败");
+        }
+    }
+
+    @GetMapping("/delUser")
+    @RequiresRoles("admin")
+    public JsonData delUser(@RequestParam int id){
+       boolean result =  userService.delUser(id);
+       if(result){
+           return JsonData.buildSuccess("删除用户成功");
+       }else{
+           return JsonData.buildError("删除用户失败");
+       }
     }
 
 

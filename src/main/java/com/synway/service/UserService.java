@@ -64,5 +64,18 @@ public class UserService {
         return resultMap;
     }
 
+    public Map<String,Object> getUserInfoById(int id){
+        return userMapper.getUserInfoById(id);
+    }
+
+    public boolean updateUser(Map<String,Object> params){
+        int i = userMapper.updateUser(params);
+        return i > 0;
+    }
+
+    public boolean delUser(int id){
+        int i = userMapper.delUser(id);
+        return i>0;
+    }
 
 }

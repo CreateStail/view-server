@@ -53,6 +53,43 @@
 
     <select id="listUser" parameterType="map" resultType="map">
         select id,name,phone,email,sex,date_format(create_time,'%Y-%m-%d %h:%i:%s') as create_time,
-           date_format(update_time,'%Y-%m-%d %h:%i:%s') as update_time from t_user where state='0'
+           date_format(update_time,'%Y-%m-%d %h:%i:%s') as update_time,
+            (select role from t_role tr where tu.id=tr.id) as role from t_user tu where state='0'
     </select>
+
+    <select id="getUserInfoById" parameterType="int" resultType="map">
+        select id,name,headImg,phone,email,sex from t_user where id = #{id}
+    </select>
+
+    <update id="updateUser" parameterType="map" >
+        update t_user set
+        <trim suffixOverrides=",">
+            <if test="username != '' and username != null">
+                name = #{username},
+            </if>
+            <if test="password != '' and password != null">
+                password =#{password},
+            </if>
+            <if test="email != '' and email != null">
+                email = #{email},
+            </if>
+            <if test="phone != '' and phone != null">
+                phone = #{phone},
+            </if>
+            <if test="sex != '' and sex != null">
+                sex = #{sex},
+            </if>
+            <if test="headImg != '' and headImg != null">
+                headImg = #{headImg},
+            </if>
+        </trim>
+            ,xgr = #{xgr},xgr_name=#{xgr_name},update_time=#{updateTime}
+            <where>
+                id = #{id}
+            </where>
+    </update>
+
+    <update id="delUser">
+        update t_user set state = '1' where id = #{id}
+    </update>
 </mapper>
